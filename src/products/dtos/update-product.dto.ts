@@ -9,6 +9,9 @@ export class UpdateProductDTO {
   @IsNotEmpty()
   @IsInt()
   @Min(0)
+  @Transform(({ value }) => {
+    return Number(value);
+  })
   price: number;
 
   @IsString()
