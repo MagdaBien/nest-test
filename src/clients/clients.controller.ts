@@ -3,6 +3,7 @@ import { ClientsService } from './clients.service';
 import { CreateClientDTO } from './dtos/create-client.dto';
 import { UpdateClientDTO } from './dtos/update-client.dto';
 import { ParseUUIDPipe } from '@nestjs/common';
+import { Client } from '@prisma/client';
 
 @Controller('clients')
 export class ClientsController {
@@ -11,19 +12,19 @@ export class ClientsController {
     }
 
     @Get('/')
-    getAll(): any {
+    getAll(): Promise<Client[]> {
         return this.clientsService.getAll();
     } 
 
     @Get('/:id')
-    async getById(@Param('id', new ParseUUIDPipe()) id: string) {
+    async getById(@Param('id', new ParseUUIDPipe()) id: string): Promise<Client | null> {
         const client = await this.clientsService.getById(id);
-        if (!client) throw new NotFoundException('Product not found');
+        if (!client) { throw new NotFoundException('Product not found');}
         return client;
     }  
 
     @Post('/')
-    create(@Body() clientData: CreateClientDTO) {
+    create(@Body() clientData: CreateClientDTO): Promise<Client> {
         return this.clientsService.create(clientData);
     } 
     
@@ -31,20 +32,20 @@ export class ClientsController {
     async update(
         @Param('id', new ParseUUIDPipe()) id: string,
         @Body() clientData: UpdateClientDTO,
-    ) {
+    ): Promise<Client> {
         if (!(await this.clientsService.getById(id)))
-            throw new NotFoundException('Client not found');
+            { throw new NotFoundException('Client not found');}
 
-        await this.clientsService.updateById(id, clientData);
-        return { success: true };
+        return await this.clientsService.updateById(id, clientData);
+        //return { success: true };
     }
 
     @Delete('/:id')
-    async deleteById(@Param('id', new ParseUUIDPipe()) id: string) {
+    async deleteById(@Param('id', new ParseUUIDPipe()) id: string): Promise<Client> {
         if (!(await this.clientsService.getById(id)))
-            throw new NotFoundException('Client not found');
-        await this.clientsService.deleteById(id);
-        return { success: true };
+           { throw new NotFoundException('Client not found');}
+        return await this.clientsService.deleteById(id);
+        //return { success: true };
     }
     
     

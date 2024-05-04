@@ -12,6 +12,7 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDTO } from './dtos/create-order.dto';
 import { UpdateOrderDTO } from './dtos/update-order.dto';
 import { ParseUUIDPipe } from '@nestjs/common';
+import { Order } from '@prisma/client';
 
 @Controller('orders')
 export class OrdersController {
@@ -20,31 +21,31 @@ export class OrdersController {
   }
 
   @Get('/extended')
-  getAllExtended(): any {
-      return this.ordersService.getAllExtended();
+  getAllExtended(): Promise<Order[]> {
+    return this.ordersService.getAllExtended();
   }
 
   @Get('/')
-  getAll(): any {
+  getAll(): Promise<Order[]> {
     return this.ordersService.getAll();
   }
 
   @Get('/extended/:id')
-  async getByIdExtended(@Param('id', new ParseUUIDPipe()) id: string) {
-      const order = await this.ordersService.getByIdExtended(id);
-      if (!order) throw new NotFoundException('Order not found');
-      return order;
-  }  
+  async getByIdExtended(@Param('id', new ParseUUIDPipe()) id: string): Promise<Order | null> {
+    const order = await this.ordersService.getByIdExtended(id);
+    if (!order) { throw new NotFoundException('Order not found'); }
+    return order;
+  }
 
   @Get('/:id')
-  async getById(@Param('id', new ParseUUIDPipe()) id: string) {
+  async getById(@Param('id', new ParseUUIDPipe()) id: string): Promise<Order | null> {
     const order = await this.ordersService.getById(id);
-    if (!order) throw new NotFoundException('Order not found');
+    if (!order) { throw new NotFoundException('Order not found'); }
     return order;
   }
 
   @Post('/')
-  create(@Body() orderData: CreateOrderDTO) {
+  create(@Body() orderData: CreateOrderDTO): Promise<Order> {
     return this.ordersService.create(orderData);
   }
 
@@ -52,19 +53,17 @@ export class OrdersController {
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() orderData: UpdateOrderDTO,
-  ) {
-    if (!(await this.ordersService.getById(id)))
-      throw new NotFoundException('Order not found');
+  ): Promise<Order> {
+    if (!(await this.ordersService.getById(id))) { throw new NotFoundException('Order not found'); }
 
-    await this.ordersService.updateById(id, orderData);
-    return { success: true };
+    return await this.ordersService.updateById(id, orderData);
+    //return { success: true };
   }
 
   @Delete('/:id')
-  async deleteById(@Param('id', new ParseUUIDPipe()) id: string) {
-    if (!(await this.ordersService.getById(id)))
-      throw new NotFoundException('Order not found');
-    await this.ordersService.deleteById(id);
-    return { success: true };
+  async deleteById(@Param('id', new ParseUUIDPipe()) id: string): Promise<Order> {
+    if (!(await this.ordersService.getById(id))) { throw new NotFoundException('Order not found'); }
+    return await this.ordersService.deleteById(id);
+    //return { success: true };
   }
 }

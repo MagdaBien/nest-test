@@ -29,7 +29,6 @@ export class ProductsService {
     });
   }
   
-
   public deleteById(id: Product['id']): Promise<Product> {
     return this.prismaService.product.delete({
       where: { id },
