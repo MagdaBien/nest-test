@@ -19,10 +19,22 @@ export class OrdersController {
     this.ordersService = ordersService;
   }
 
+  @Get('/extended')
+  getAllExtended(): any {
+      return this.ordersService.getAllExtended();
+  }
+
   @Get('/')
   getAll(): any {
     return this.ordersService.getAll();
   }
+
+  @Get('/extended/:id')
+  async getByIdExtended(@Param('id', new ParseUUIDPipe()) id: string) {
+      const order = await this.ordersService.getByIdExtended(id);
+      if (!order) throw new NotFoundException('Order not found');
+      return order;
+  }  
 
   @Get('/:id')
   async getById(@Param('id', new ParseUUIDPipe()) id: string) {

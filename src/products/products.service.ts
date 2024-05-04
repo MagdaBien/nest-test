@@ -8,15 +8,27 @@ export class ProductsService {
     this.prismaService = prismaService;
   }
 
+  public getAllExtended(): Promise<Product[]> {
+    return this.prismaService.product.findMany({include: { orders: true }});
+  }
+
   public getAll(): Promise<Product[]> {
     return this.prismaService.product.findMany();
   }
+
+  public getByIdExtended(id: Product['id']): Promise<Product | null> {
+    return this.prismaService.product.findUnique({
+      where: { id },
+      include: { orders: true }
+    });
+  }  
 
   public getById(id: Product['id']): Promise<Product | null> {
     return this.prismaService.product.findUnique({
       where: { id },
     });
   }
+  
 
   public deleteById(id: Product['id']): Promise<Product> {
     return this.prismaService.product.delete({
